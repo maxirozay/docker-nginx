@@ -14,6 +14,13 @@ services:
       - ./sites/:/sites/:ro
     extra_hosts:
       - "host.docker.internal:host-gateway"
+    entrypoint: /bin/sh -c "
+      nginx -g 'daemon off;' &
+      trap exit TERM;
+      while :; do 
+        sleep 24h & wait $${!}; 
+        nginx -s reload;
+      done"
 
   certbot:
     image: certbot/certbot:latest
@@ -24,7 +31,6 @@ services:
     entrypoint: /bin/sh -c "
       trap exit TERM;
       while :; do 
-        sleep 167h & wait $${!}; 
+        sleep 24h & wait $${!}; 
         certbot renew --webroot;
-        sleep 1h & wait $${!};
       done"
